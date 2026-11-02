@@ -53,10 +53,15 @@ Hecho:
 - Todo registrado en el admin de Django (con inline de `WorkoutExercise` dentro de `Workout`).
 - Comando `seed_demo`: 1 admin, 1 monitor (Julio), 3 clientes (Laura, Marcos, Sofía), 15 ejercicios, 5 entrenos por cliente.
 - `README.md` con instrucciones de arranque y usuarios de demo.
+- API REST completa:
+  - `POST /api/token/`, `POST /api/token/refresh/` (login JWT, de simplejwt).
+  - `GET /api/me/`.
+  - `GET /api/my-workouts/?week=YYYY-MM-DD`, `GET /api/workouts/<id>/`, `POST /api/workouts/<id>/complete/` (cliente).
+  - `GET /api/monitor/clients/`, `POST /api/monitor/workouts/`, `PUT /api/monitor/workouts/<id>/` (monitor, protegidos con el permiso `IsMonitor` en `users/permissions.py`).
+  - Aislamiento de datos: un cliente nunca ve entrenos ajenos (404, no 403, para no revelar su existencia); un monitor no puede crear/editar entrenos de clientes que no son suyos.
+- 11 tests de permisos en `workouts/tests.py` (login real vía JWT + `force_authenticate` para los casos de permisos), todos en verde.
 
 Pendiente:
-- API REST (JWT login, `/api/me/`, `/api/my-workouts/`, `/api/workouts/<id>/`, `/api/workouts/<id>/complete/`, endpoints de monitor para clientes/entrenos).
-- Tests de permisos.
 - Frontend completo (Vite + React + TS + Tailwind): login, rutas protegidas por rol, pantallas Cliente (Hoy, detalle de ejercicio) y Monitor (lista de clientes, asignar entrenos).
 
 Fase posterior (no en Fase 1): mapa muscular visual.

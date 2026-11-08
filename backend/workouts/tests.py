@@ -170,3 +170,29 @@ class MonitorEndpointTests(APITestCase):
         }
         response = self.client.put(f"/api/monitor/workouts/{workout.id}/", payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_monitor_can_list_their_clients_workouts(self):
+        workout = Workout.objects.create(
+            client=self.laura,
+            monitor=self.monitor,
+            title="Empuje",
+            scheduled_date=date.today(),
+            status=Workout.Status.PLANNED,
+        )
+        self.client.force_authenticate(user=self.monitor)
+        response = self.client.get(f"/api/monitor/workouts/?client={self.laura.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(workout.id, [w["id"] for w in response.data])
+
+    def test_monitor_cannot_list_other_monitors_client_workouts(self):
+        Workout.objects.create(
+            client=self.other_client,
+            monitor=self.other_monitor,
+            title="Empuje",
+            scheduled_date=date.today(),
+            status=Workout.Status.PLANNED,
+        )
+        self.client.force_authenticate(user=self.monitor)
+        response = self.client.get(f"/api/monitor/workouts/?client={self.other_client.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)

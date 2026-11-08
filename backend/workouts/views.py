@@ -65,6 +65,13 @@ class MonitorClientsView(APIView):
 class MonitorWorkoutsView(APIView):
     permission_classes = [IsAuthenticated, IsMonitor]
 
+    def get(self, request):
+        client_id = request.query_params.get("client")
+        if not client_id:
+            return Response({"detail": "Missing 'client' query param."}, status=400)
+        workouts = Workout.objects.filter(monitor=request.user, client_id=client_id)
+        return Response(WorkoutSerializer(workouts, many=True).data)
+
     def post(self, request):
         serializer = WorkoutWriteSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)

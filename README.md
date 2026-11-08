@@ -6,13 +6,13 @@ Es una demo: datos de ejemplo, sin pagos, sin dietas, sin vídeos.
 
 ## Estado actual
 
-- **Backend**: modelos (`User` con roles, `Exercise`, `Workout`, `WorkoutExercise`), panel de administración de Django, comando de datos de ejemplo (`seed_demo`). La API REST para el frontend está en construcción.
-- **Frontend**: todavía no creado.
+- **Backend**: modelos (`User` con roles, `Exercise`, `Workout`, `WorkoutExercise`), panel de administración de Django, comando de datos de ejemplo (`seed_demo`), API REST completa (JWT, entrenos del cliente, gestión del monitor) con tests de permisos.
+- **Frontend**: React + Vite + TypeScript + Tailwind. Login, rutas protegidas por rol, pantalla "Hoy" y detalle de entreno (cliente), lista de clientes y ficha/asignación de entrenos (monitor).
 
 ## Requisitos
 
 - Python 3.10+
-- Node.js 18+ y npm (cuando se cree el frontend)
+- Node.js 18+ y npm
 - Git
 
 ## Estructura de carpetas
@@ -27,7 +27,13 @@ gym-app/
 │   ├── users/              # modelo de usuario personalizado (role, monitor)
 │   ├── exercises/          # catálogo de ejercicios (músculos principales/secundarios)
 │   └── workouts/           # entrenos y su contenido (WorkoutExercise) + comando seed_demo
-└── frontend/               # (pendiente) React + Vite + TypeScript
+└── frontend/
+    ├── .env.example        # copiar a .env para desarrollo local
+    └── src/
+        ├── api/            # cliente fetch (client.ts) y tipos TypeScript (types.ts)
+        ├── auth/            # AuthContext: sesión, token, login/logout
+        ├── components/      # ProtectedRoute (rutas según rol)
+        └── pages/           # Login, Today, ExerciseDetail, MonitorClients, MonitorAssign
 ```
 
 ## Backend: cómo arrancarlo
@@ -106,6 +112,38 @@ Todos creados por `seed_demo`.
 
 ⚠️ Contraseñas de demo únicamente — no usar en producción.
 
-## Frontend
+## Frontend: cómo arrancarlo
 
-Pendiente de crear (React + Vite + TypeScript + Tailwind). Esta sección se actualizará cuando exista.
+El backend (paso anterior) debe estar corriendo en `http://127.0.0.1:8000/` para que el frontend pueda iniciar sesión y pedir datos.
+
+### 1. Instalar dependencias
+
+**Windows (PowerShell) y Mac/Linux (mismo comando):**
+```bash
+cd frontend
+npm install
+```
+
+### 2. Configurar variables de entorno
+
+Copia `.env.example` a `.env` (no se sube a Git):
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
+```
+
+**Mac/Linux:**
+```bash
+cp .env.example .env
+```
+
+Por defecto apunta al backend local (`VITE_API_URL=http://127.0.0.1:8000`); no hace falta cambiar nada para la demo.
+
+### 3. Arrancar el servidor de desarrollo
+
+```bash
+npm run dev
+```
+
+Abre `http://localhost:5173/` y entra con cualquiera de los usuarios de demo de la tabla anterior (excepto `admin`, que solo gestiona usuarios desde `/admin/`, no desde esta app).
